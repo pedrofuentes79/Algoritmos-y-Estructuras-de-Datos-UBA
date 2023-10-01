@@ -61,39 +61,6 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     }
 
     public void eliminar(int i) {
-        /*
-        Nodo prevNode = actual.anterior;
-        Nodo currNode = actual;
-        Nodo nextNode = actual.siguiente;
-
-        for (int j=0; j<i; j++){
-            nextNode = nextNode.siguiente;
-            prevNode = currNode;
-            currNode = nextNode.anterior;
-        }
-
-        if (i==0){
-            if (nextNode != null){
-                currNode = nextNode;
-                nextNode = nextNode.siguiente;
-            } else {
-            currNode = null;
-            } 
-        } else if (nextNode != null){
-            nextNode = nextNode.siguiente;
-            prevNode = currNode;
-            currNode = nextNode.anterior;
-        } else {
-            currNode = prevNode;
-            nextNode = null;
-
-        }
-        actual = currNode;
-        actual.anterior = prevNode;
-        actual.siguiente = nextNode;
-
-        size--;
-         */
         Nodo curr = actual;
         Nodo prev = actual;
 
@@ -145,9 +112,9 @@ public class ListaEnlazada<T> implements Secuencia<T> {
     @Override
     public String toString() {
         Nodo tmp = actual;
-        StringBuffer buffer = new StringBuffer(null);
+        StringBuffer buffer = new StringBuffer();
         buffer.append("[");
-        while(tmp.siguiente.siguiente != null){
+        while(tmp.siguiente != null){
             buffer.append(tmp.valor);
             buffer.append(", ");
             tmp = tmp.siguiente;
@@ -157,7 +124,7 @@ public class ListaEnlazada<T> implements Secuencia<T> {
         return buffer.toString();
 
     }
-    /* 
+    /* Implementación fallida del Iterador con Nodo en vez de puntero
     private class ListaIterador implements Iterador<T> {
     	// Completar atributos privados
         Nodo curr;
