@@ -238,13 +238,10 @@ class ABBTests {
             assertEquals(true,conjunto.pertenece(k));
             assertEquals(NCLAVES,conjunto.cardinal());
         }
-        // chequear que estén solo una vez
-        assertEquals(NCLAVES, conjunto.cardinal());
 
         // Eliminar los valores para i par
         for (Integer i = 0; i < NCLAVES; i++) {
             Integer k = clave(i);
-            System.out.println(k);
             assertEquals(true, conjunto.pertenece(k));
             if (i % 2 == 0) {
                 conjunto.eliminar(k);

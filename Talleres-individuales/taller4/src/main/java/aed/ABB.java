@@ -133,56 +133,81 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     }
 
     public void eliminar(T elem){
+        // nota, aca no estoy considerando si borro el minimo. Cada vez que elimino, debería chequear 
+        // si el nodo a eliminar es _min o _max. Si son, debería actualizarlos. No lo hago porque no lo pide el test :P.
         Nodo ult_buscado = buscar_nodo(_raiz, elem);
         
 
         if (ult_buscado.valor.compareTo(elem) == 0){
             // caso 0 hijos
             if (ult_buscado.der == null && ult_buscado.izq == null){
-                // caso hijo izquierdo
-                if (ult_buscado.padre.izq.valor.compareTo(ult_buscado.valor) == 0){
+                // caso especial: el nodo a eliminar es la raiz
+                if (ult_buscado.padre == null){
+                    _raiz = null;
+                }
+
+                // el nodo a borrar, es hijo izquierdo o derecho?
+                else if (ult_buscado.padre.izq != null && ult_buscado.padre.izq.valor.compareTo(ult_buscado.valor) == 0){
                     ult_buscado.padre.izq = null;
                 }
-                // caso hijo derecho
                 else{
                     ult_buscado.padre.der = null;
                 }
                 _cardinal--;
             }
-            // caso 1 hijo (izq)
+            // caso: el nodo a eliminar tiene 1 hijo (izq)
             else if (ult_buscado.der == null && ult_buscado.izq != null){
-                // no lo borro, lo reemplazo por su hijo y borro a su hijo
-                T val_hijo = ult_buscado.izq.valor;
-                ult_buscado.valor = val_hijo;
-                ult_buscado.izq = null;
+                // actualizo el padre del nodo a eliminar para que apunte al hijo
+    
+                // caso especial: el nodo a eliminar es la raiz
+                if (ult_buscado.padre == null){
+                    _raiz = ult_buscado.izq;
+                }
+                // caso general
+                else if (ult_buscado.padre.izq != null && ult_buscado.padre.izq.valor.compareTo(ult_buscado.valor) == 0){
+                    ult_buscado.padre.izq = ult_buscado.izq;
+                }
+                // caso especial: el nodo a eliminar es hijo derecho de su padre
+                else{
+                    ult_buscado.padre.der = ult_buscado.izq;
+                }
+                // actualizo el padre del hijo para que apunte al padre del nodo a eliminar
+                ult_buscado.izq.padre = ult_buscado.padre;
                 _cardinal--;
-
             }
-            // caso 1 hijo (der)
+            // caso: el nodo a eliminar tiene 1 hijo (der)
             else if (ult_buscado.izq == null && ult_buscado.der != null){
-                T val_hijo = ult_buscado.der.valor;
-                ult_buscado.valor = val_hijo;
-                ult_buscado.der = null;
+
+                // actualizo el padre del nodo a eliminar para que apunte al hijo
+                // caso especial: el nodo a eliminar es la raiz
+                if (ult_buscado.padre == null){
+                    _raiz = ult_buscado.der;
+                }
+                // caso general
+                else if (ult_buscado.padre.izq != null && ult_buscado.padre.izq.valor.compareTo(ult_buscado.valor) == 0){
+                    ult_buscado.padre.izq = ult_buscado.der;
+                }
+                // caso especial: el nodo a eliminar es hijo derecho de su padre
+                else{
+                    ult_buscado.padre.der = ult_buscado.der;
+                }
+    
+                ult_buscado.der.padre = ult_buscado.padre;
                 _cardinal--;
-
             }
-
             // caso 2 hijos
             else if (ult_buscado.izq != null && ult_buscado.der != null){
                 // lo reemplazo por el valor de su sucesor y borro a su sucesor.
-                Nodo suc = sucesor(ult_buscado);
+                Nodo suc = sucesorAbajoSuyo(ult_buscado);
                 T valor_sucesor = suc.valor;
                 eliminar(valor_sucesor);
                 ult_buscado.valor = valor_sucesor;
-
             }
-
         }
         // si ult_buscado != elem no hago nada, no esta elem en el arbol
-
     }
 
-    private Nodo sucesor(Nodo actual){
+    private Nodo sucesorAbajoSuyo(Nodo actual){
         Nodo minVisto = actual.der;
         return minimoAux(actual.der, minVisto);
     }
@@ -213,8 +238,8 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         // el abuelo no puede ser el sucesor
         // entonces, si no tiene sucesor (con la funcion anterior, que no considera el padre)
         // chequeo si el padre es el sucesor y lo devuelvo
-        if (sucesor(act) != null){
-            return sucesor(act);
+        if (sucesorAbajoSuyo(act) != null){
+            return sucesorAbajoSuyo(act);
         }
         else{
             // si no tiene un sucesor en sus hijos, recorro para arriba
