@@ -38,11 +38,29 @@ public class SistemaCNE {
     }
 
     public String distritoDeMesa(int idMesa) {
-        throw new UnsupportedOperationException("No implementada aun");
+            
+        int low = 0;
+        int high = len(mesasPorDistritos) - 1;
+        
+        // small check so that the list isn't out of range at the end
+        if (idMesa == mesasPorDistritos[high]) return high;
+        
+        while (low <= high){
+            int mid = (low + high) / 2;
+    
+            if (idMesa < mesasPorDistritos[mid]){
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return high + 1;
+
     }
     // O(3P + log(D))
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
         // sumo los votos presidenciales : O(P)
+        // chequeo que si hay ballotage : O(P)
 
         // busco el distrito de la mesa con la busqueda binaria  : O(log(D))
 
