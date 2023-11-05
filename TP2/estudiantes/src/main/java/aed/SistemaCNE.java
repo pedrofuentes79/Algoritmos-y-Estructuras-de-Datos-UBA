@@ -12,6 +12,7 @@ public class SistemaCNE {
     private MaxHeap[] resultadosPorDistritos;
 
     public class VotosPartido{
+        // ambos >= 0
         private int presidente;
         private int diputados;
         VotosPartido(int presidente, int diputados){this.presidente = presidente; this.diputados = diputados;}
@@ -20,7 +21,6 @@ public class SistemaCNE {
     }
 
     public SistemaCNE(String[] nombresDistritos, int[] diputadosPorDistrito, String[] nombresPartidos, int[] ultimasMesasDistritos) {
-        // seteo las variables obvias
         this.nombrePartido = nombresPartidos;
         this.nombreDistrito = nombresDistritos;
         this.diputadosEnDisputa = diputadosPorDistrito;
@@ -78,6 +78,12 @@ public class SistemaCNE {
         return nombreDistrito[idDistritoMesa(idMesa)];
     }
     // O(3P + log(D))
+
+
+    // actamesa = [(0,0), (100,100), (50,30)]
+    // votosPres = [1000, 200+100, 100+50]
+
+
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
         // sumo los votos presidenciales : O(P)
         for (int i=0; i<P; i++){
@@ -129,6 +135,7 @@ public class SistemaCNE {
     }
 
     public int[] resultadosDiputados(int idDistrito){
+        // 
         int[] res = new int[this.P];
         int bancasDisputa = diputadosEnDisputa(idDistrito); // O(1)
         for (int i=0; i<bancasDisputa; i++){ // O(bancasDisputa)
