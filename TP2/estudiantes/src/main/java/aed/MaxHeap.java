@@ -16,8 +16,6 @@ public class MaxHeap {
 
     public MaxHeap(int[] s){
         // Array2Heap
-        // s es de longitud P-1 porque le sacamos los votos en blanco
-        // este heap tendrá solo a los elementos que pasen el umbral?
         this.posProximo = 0;
         this.votosTotalesDelDistrito = 0;
 
@@ -25,17 +23,17 @@ public class MaxHeap {
         for (int i=0; i<s.length; i++)
             this.votosTotalesDelDistrito += s[i];
 
-        // Busco la cantidad de elementos validos (que pasan el umbral)
+        // Busco la cantidad de elementos que pasan el umbral (no tengo en cuenta los votos en blanco) ==> O(P)
         int cantElementosValidos = 0;
-        for (int i=0; i<s.length; i++){
+        for (int i=0; i<s.length - 1; i++){
             if (s[i] > this.votosTotalesDelDistrito*0.03)
                 cantElementosValidos++;
         }
         this.len = cantElementosValidos;
         this.elementos = new NodoDHont[cantElementosValidos];
 
-        // Meto los que pasan el umbral en el array ==> O(P)
-        for (int i = 0; i < s.length; i++) {
+        // Meto los que pasan el umbral en el array (no tengo en cuenta los votos en blanco)==> O(P)
+        for (int i = 0; i < s.length - 1; i++) {
             if (s[i] > this.votosTotalesDelDistrito*0.03) {
                 this.elementos[this.posProximo] = new NodoDHont(i, s[i]);
                 this.posProximo++;
@@ -46,10 +44,6 @@ public class MaxHeap {
         for (int i = (posProximo / 2) - 1; i >= 0; i--) {
             siftDown(i); 
         }
-    }
-
-    public boolean pasaElUmbral(int votos, int votosTotales){
-        return votos > votosTotales*0.03;
     }
 
     public void siftDown(int i) {

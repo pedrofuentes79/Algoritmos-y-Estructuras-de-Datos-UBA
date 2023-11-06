@@ -328,7 +328,6 @@ class SistemaCNETests {
         assertEquals(1, sistema.resultadosDiputados(5)[4]);
     }
 
-    // este no pasa
     @Test
     void unoSuperaElUmbral(){
         int[][] votosMesa1 = {{84, 84}, {13, 13}, {15, 15}, {14, 14}, {0, 0}, {1510, 1510}};
@@ -419,8 +418,6 @@ class SistemaCNETests {
         assertTrue(sistema.hayBallotage());
     }
 
-    // los de complejidad pasan!!!!
-
     @Test
     @Timeout(2)
     void complejidadObtenerDistritosDeMesas() {
@@ -457,7 +454,7 @@ class SistemaCNETests {
 
     // este no pasa
     @Test
-    @Timeout(4)
+    @Timeout(3)
     void complejidadResultadosDiputados() {
         int cantDistritos = (int) 50;
         int mesasPorDistrito = 10;

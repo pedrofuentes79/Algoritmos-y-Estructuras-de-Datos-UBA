@@ -107,17 +107,8 @@ public class SistemaCNE {
         // Hago la copia con los votos ya sumados
         int[] votosDistrito = this.votosDiputados[idDistrito].clone(); // O(P)
 
-        // antes, le saco los votos en blanco, que me arruinarían la matriz de dhont ==> O(P)
-        int[] votosDistritoSinBlanco = new int[P-1];
-        for (int i=0; i<P-1; i++){
-            votosDistritoSinBlanco[i] = votosDistrito[i];
-        }
-
         // luego, transformo ese array en un heap y "piso" el heap anterior : O(P)
-        this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistritoSinBlanco);
-
-        // actualizo el umbral
-        
+        this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistrito);        
 
     }
 
@@ -153,6 +144,8 @@ public class SistemaCNE {
     }
 
     public int[] resultadosDiputados(int idDistrito){
+        // se pide O(Dd * log(P))
+
         // hay que arreglar esto
         // el problema es que res parece cambiar a medida que se ejecuta el for más de una vez
         // inicializo en p-1 porque no quiero contar los votos en blanco
