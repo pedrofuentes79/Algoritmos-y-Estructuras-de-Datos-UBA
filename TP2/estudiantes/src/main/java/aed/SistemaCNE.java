@@ -24,10 +24,10 @@ public class SistemaCNE {
         this.nombrePartido = nombresPartidos;
         this.nombreDistrito = nombresDistritos;
         this.diputadosEnDisputa = diputadosPorDistrito;
-        this.P = nombresPartidos.length;
+        this.P = nombresPartidos.length; // P incluye los votos en blanco
         this.D = nombresDistritos.length;
-        this.votosDiputados = new int[D][P+1];
-        this.votosPresidenciales = new int[P+1];
+        this.votosDiputados = new int[D][P];
+        this.votosPresidenciales = new int[P];
         // que pasa cuando hay 0 votos para cada partido?
         this.hayBallotage = false;
 
@@ -36,9 +36,9 @@ public class SistemaCNE {
         // construir la matriz de MaxHeaps (de long P) inicializada en 0
         this.resultadosPorDistritos = new MaxHeap[D];
 
-        // inicializar los MaxHeaps en 0 (????)
+        // inicializar los MaxHeaps en 0, con longitud P-1 así saco los votos en blanco
         for (int i=0; i<D; i++){
-            this.resultadosPorDistritos[i] = new MaxHeap(P);
+            this.resultadosPorDistritos[i] = new MaxHeap(P-1);
         }
     }
 
@@ -84,7 +84,7 @@ public class SistemaCNE {
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
         // busco el distrito de la mesa con la busqueda binaria  : O(log(D))
         int idDistrito = idDistritoMesa(idMesa);
-        int[] votosDistrito = this.votosDiputados[idDistrito].clone();
+        int[] votosDistrito = this.votosDiputados[idDistrito].clone(); // O(P)
 
         // sumo los votos presidenciales : O(P)
         for (int i=0; i<P; i++){
@@ -95,8 +95,15 @@ public class SistemaCNE {
         // chequeo si hay ballotage : O(P)
         this.hayBallotage = auxBallotage(this.votosPresidenciales);
 
+        
+        // antes, le saco los votos en blanco, que me arruinarían la matriz de dhont ==> O(P)
+        int[] votosDistritoSinBlanco = new int[P-1];
+        for (int i=0; i<P-1; i++){
+            votosDistritoSinBlanco[i] = votosDistrito[i];
+        }
+
         // luego, transformo ese array en un heap y "piso" el heap anterior : O(P)
-        this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistrito);
+        this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistritoSinBlanco);
 
     }
 
@@ -132,7 +139,8 @@ public class SistemaCNE {
     }
 
     public int[] resultadosDiputados(int idDistrito){
-        // 
+        // hay que arreglar esto
+        // el problema es que res parece cambiar a medida que se ejecuta el for más de una vez
         int[] res = new int[this.P]; // O(P)????
         int bancasDisputa = diputadosEnDisputa(idDistrito); // O(1)
 

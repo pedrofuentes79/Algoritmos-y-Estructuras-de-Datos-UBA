@@ -7,7 +7,7 @@ public class MaxHeap{
 
     private NodoDHont[] elementos;
     private int posProximo; 
-    private int P;
+    private int len;
     private int votosTotalesDelDistrito;
 
     // armar un constructor que devuelva un heap con todos 0
@@ -16,7 +16,8 @@ public class MaxHeap{
 
     public MaxHeap(int[] s){
         // Array2Heap
-        // the array must be of length P
+        // s es de longitud P-1 porque le sacamos los votos en blanco
+        // este heap tendrá solo a los elementos que pasen el umbral?
         this.posProximo = 0;
         this.votosTotalesDelDistrito = 0;
 
@@ -30,7 +31,7 @@ public class MaxHeap{
             if (s[i] > this.votosTotalesDelDistrito*0.03)
                 cantElementosValidos++;
         }
-        this.P = cantElementosValidos;
+        this.len = cantElementosValidos;
         this.elementos = new NodoDHont[cantElementosValidos];
 
         // Meto los que pasan el umbral en el array ==> O(P)
@@ -57,12 +58,12 @@ public class MaxHeap{
         int right = 2 * i + 2;
 
         // si existe el hijo izquierdo y es mayor que el padre
-        if (left < posProximo && elementos[left].cocientes > elementos[largest].cocientes) {
+        if (left < posProximo && elementos[left].cociente > elementos[largest].cociente) {
             largest = left;
         }
 
         // si existe el hijo derecho y es mayor que el padre
-        if (right < posProximo && elementos[right].cocientes > elementos[largest].cocientes) {
+        if (right < posProximo && elementos[right].cociente > elementos[largest].cociente) {
             largest = right;
         }
 
@@ -78,10 +79,9 @@ public class MaxHeap{
 
 
     public MaxHeap(int P){
-        // Armamos un ArrayHeap con los elementos del array
-        // HeapSort
+        // Armo un heap vacío de tamaño P
         this.elementos = new NodoDHont[P];
-        this.P = P;
+        this.len = P;
         this.posProximo = 0;
     }
 
@@ -92,29 +92,34 @@ public class MaxHeap{
         Subir();
     }
 
+
     public int Dividir(){
-        // Lo usamos para obtener los escaños por partidos,
-        // Se le asigna una banca al partido de la raiz del heap y se reordena el heap
-        // actualizando el cociente de la raiz (una division D'Hont más)
+            // Lo usamos para obtener los escaños por partidos,
+            // Se le asigna una banca al partido de la raiz del heap y se reordena el heap
+            // actualizando el cociente de la raiz (una division D'Hont más)
 
-        // Obtengo el idPartido de la raiz
-        int res = this.elementos[0].idPartido;
-        // Divido la raiz
-        this.elementos[0].cocientes = (this.elementos[0].cocientes * this.elementos[0].vecesDividido)/ (this.elementos[0].vecesDividido +1);
-        this.elementos[0].vecesDividido++;
+            // Obtengo el idPartido de la raiz
+            int res = this.elementos[0].idPartido;
 
-        // Reordenamos el heap (si es necesario) ==> O(log(P))
-        Bajar();
+            // Le asigno un escaño más a la raíz
+            this.elementos[0].escañosAsignados++;
 
-        return res;        
-    }
+            // Actualizo el cociente de la raíz
+            this.elementos[0].cociente = this.elementos[0].votosOriginales / (this.elementos[0].escañosAsignados + 1);
+
+            // Reordenamos el heap ==> O(log(P))
+            Bajar();
+
+            return res;        
+        }
+
 
     public void Subir(){
         // Esta funcion solo funciona cuando se le pide subir el ultimo elemento agregado
         int pos = this.posProximo-1;
         int posPadre = (pos-1)/2;
 
-        while(pos > 0 && this.elementos[posPadre].cocientes < this.elementos[pos].cocientes){
+        while(pos > 0 && this.elementos[posPadre].cociente < this.elementos[pos].cociente){
             // Swap con el padre
             NodoDHont aux = this.elementos[posPadre];
             this.elementos[posPadre] = this.elementos[pos];
@@ -131,11 +136,23 @@ public class MaxHeap{
         int posHijoIzq = 2*pos+1;
         int posHijoDer = 2*pos+2;
 
-        while (pos < P && !esHoja(pos) && tieneUnHijoMayor(pos)){
-            // Hacemos un swap con el hijo que tenga mayor prioridad
-            System.out.println(pos);
-            if(this.elementos[posHijoIzq].cocientes 
-            > this.elementos[posHijoDer].cocientes){
+        while (pos < this.len && !esHoja(pos) && tieneUnHijoMayor(pos)){
+            // Hacemos un swap con el hijo que sea mayor
+
+            // caso tiene solamente hijo izquierdo e izq>padre
+            if (posHijoDer >= this.len){
+                // Swap con el hijo izquierdo
+                NodoDHont aux = this.elementos[posHijoIzq];
+                this.elementos[posHijoIzq] = this.elementos[pos];
+                this.elementos[pos] = aux;
+                // Actualizamos posiciones
+                pos = posHijoIzq;
+                posHijoIzq = 2*pos+1;
+                posHijoDer = 2*pos+2;
+                continue;
+            }
+            // caso tiene ambos hijos y el izq>der
+            else if(this.elementos[posHijoIzq].cociente > this.elementos[posHijoDer].cociente){
                 // Swap con el hijo izquierdo
                 NodoDHont aux = this.elementos[posHijoIzq];
                 this.elementos[posHijoIzq] = this.elementos[pos];
@@ -143,6 +160,7 @@ public class MaxHeap{
                 // Actualizamos posiciones
                 pos = posHijoIzq;
             }
+            // caso tiene ambos hijos y el der>=izq
             else{
                 // Swap con el hijo derecho
                 NodoDHont aux = this.elementos[posHijoDer];
@@ -159,7 +177,7 @@ public class MaxHeap{
 
     private boolean esHoja(int pos){
         // Es hoja si no tiene hijo izquierdo
-        return 2*pos+1 >= P;
+        return 2*pos+1 >= this.len;
     }
 
     private boolean tieneUnHijoMayor(int pos){
@@ -167,12 +185,12 @@ public class MaxHeap{
         int posHijoDer = 2*pos+2;
         int posHijoIzq = 2*pos+1;
 
-        if (posHijoDer < P){
-            return this.elementos[pos].cocientes < this.elementos[posHijoIzq].cocientes || 
-                   this.elementos[pos].cocientes < this.elementos[posHijoDer].cocientes;
+        if (posHijoDer < this.len){
+            return this.elementos[pos].cociente < this.elementos[posHijoIzq].cociente || 
+                   this.elementos[pos].cociente < this.elementos[posHijoDer].cociente;
         }
         else{
-            return this.elementos[pos].cocientes < this.elementos[posHijoIzq].cocientes;
+            return this.elementos[pos].cociente < this.elementos[posHijoIzq].cociente;
         }
     }
 }

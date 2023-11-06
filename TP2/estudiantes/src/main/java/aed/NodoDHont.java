@@ -2,13 +2,15 @@ package aed;
 
 public class NodoDHont{
     public int idPartido;
-    public int cocientes;
-    public int vecesDividido;
+    public int votosOriginales;
+    public int cociente;
+    public int escañosAsignados;
 
-    public NodoDHont(int idPartido, int cocientes){
+    public NodoDHont(int idPartido, int votos){
         this.idPartido = idPartido;
-        this.cocientes = cocientes;
-        this.vecesDividido = 1;
+        this.votosOriginales = votos;
+        this.cociente = votos;
+        this.escañosAsignados = 0;
     }
 
 }

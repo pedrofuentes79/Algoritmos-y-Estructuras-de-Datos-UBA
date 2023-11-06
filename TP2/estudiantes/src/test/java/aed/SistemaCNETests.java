@@ -280,6 +280,8 @@ class SistemaCNETests {
         int[][] votosMesa4 = {{640, 640}, {180, 170}, {510, 490}, {290, 380}, {100, 40}, {0, 0}};
         registrarVotosDeMesa(sistema, 195, votosMesa4);
 
+
+        // esto falla porque se está cambiando el heap
         assertEquals(7, sistema.resultadosDiputados(3)[0]);
         assertEquals(4, sistema.resultadosDiputados(3)[1]);
         assertEquals(5, sistema.resultadosDiputados(3)[2]);
@@ -301,13 +303,13 @@ class SistemaCNETests {
         registrarVotosDeMesa(sistema, 99, votosMesaBuenosAires);
         registrarVotosDeMesa(sistema, 279, votosMesaCorrientes);
         registrarVotosDeMesa(sistema, 243, votosMesaSanJuan);
-        /* 
+        
         assertEquals(3, sistema.resultadosDiputados(2)[0]);
         assertEquals(5, sistema.resultadosDiputados(2)[1]);
         assertEquals(7, sistema.resultadosDiputados(2)[2]);
         assertEquals(2, sistema.resultadosDiputados(2)[3]);
         assertEquals(1, sistema.resultadosDiputados(2)[4]);
-        */
+        
         assertEquals(18, sistema.resultadosDiputados(0)[0]);
         assertEquals(5, sistema.resultadosDiputados(0)[1]);
         assertEquals(10, sistema.resultadosDiputados(0)[2]);
@@ -418,6 +420,8 @@ class SistemaCNETests {
         assertTrue(sistema.hayBallotage());
     }
 
+    // los de complejidad pasan!!!!
+
     @Test
     @Timeout(2)
     void complejidadObtenerDistritosDeMesas() {
@@ -434,7 +438,6 @@ class SistemaCNETests {
         }
     }
 
-    // PASA!!!
     @Test
     @Timeout(4)
     void complejidadRegistrarMesa() {
@@ -455,7 +458,7 @@ class SistemaCNETests {
 
     // este no pasa
     @Test
-    @Timeout(5)
+    @Timeout(4)
     void complejidadResultadosDiputados() {
         int cantDistritos = (int) 50;
         int mesasPorDistrito = 10;
