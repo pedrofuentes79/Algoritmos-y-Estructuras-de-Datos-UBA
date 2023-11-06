@@ -3,7 +3,7 @@ import aed.NodoDHont;
 
 // pasa el umbral si supera el 3% de los votos
 
-public class MaxHeap{
+public class MaxHeap {
 
     private NodoDHont[] elementos;
     private int posProximo; 
@@ -97,6 +97,8 @@ public class MaxHeap{
             // Lo usamos para obtener los escaños por partidos,
             // Se le asigna una banca al partido de la raiz del heap y se reordena el heap
             // actualizando el cociente de la raiz (una division D'Hont más)
+
+            // chequeo que la raiz pase el umbral???
 
             // Obtengo el idPartido de la raiz
             int res = this.elementos[0].idPartido;

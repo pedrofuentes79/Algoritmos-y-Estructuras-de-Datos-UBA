@@ -290,7 +290,6 @@ class SistemaCNETests {
     }
 
 
-    // este no pasa
     @Test
     void obtenerResultadosDiputadosVariosDistritos(){
         int[][] votosMesaCordoba = {{1577, 1577}, {2457, 2457}, {3417, 3417}, {947, 947}, {553, 553}, {114, 114}};

@@ -11,6 +11,10 @@ public class SistemaCNE {
     private int[] mesasPorDistritos;
     private MaxHeap[] resultadosPorDistritos;
 
+    // variables de escaños asignados
+    private boolean[] fueCalculado;
+    private int[][] escañosAsignados;
+
     public class VotosPartido{
         // ambos >= 0
         private int presidente;
@@ -35,6 +39,11 @@ public class SistemaCNE {
         
         // construir la matriz de MaxHeaps (de long P) inicializada en 0
         this.resultadosPorDistritos = new MaxHeap[D];
+
+        // construir el array de fueCalculado (todos en false) y el array de escañosAsignados (todos en 0)
+        this.fueCalculado = new boolean[D];
+        this.escañosAsignados = new int[D][P-1];
+
 
         // inicializar los MaxHeaps en 0, con longitud P-1 así saco los votos en blanco
         for (int i=0; i<D; i++){
@@ -78,24 +87,26 @@ public class SistemaCNE {
     public String distritoDeMesa(int idMesa) {
         return nombreDistrito[idDistritoMesa(idMesa)];
     }
-    // O(3P + log(D))
-
 
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
+        // se pide O(P + log(D))
+        // si se pide registrar una mesa después de haber calculado los escaños, esa distribucion de escaños puede estar mal
+            // a menos que pueda calcular de vuelta los escaños en la complejidad pedida
+
         // busco el distrito de la mesa con la busqueda binaria  : O(log(D))
         int idDistrito = idDistritoMesa(idMesa);
-        int[] votosDistrito = this.votosDiputados[idDistrito].clone(); // O(P)
 
         // sumo los votos presidenciales : O(P)
         for (int i=0; i<P; i++){
             this.votosPresidenciales[i] += actaMesa[i].votosPresidente();
             this.votosDiputados[idDistrito][i] += actaMesa[i].votosDiputados();
-            votosDistrito[i] += actaMesa[i].votosDiputados();
         }
         // chequeo si hay ballotage : O(P)
         this.hayBallotage = auxBallotage(this.votosPresidenciales);
 
-        
+        // Hago la copia con los votos ya sumados
+        int[] votosDistrito = this.votosDiputados[idDistrito].clone(); // O(P)
+
         // antes, le saco los votos en blanco, que me arruinarían la matriz de dhont ==> O(P)
         int[] votosDistritoSinBlanco = new int[P-1];
         for (int i=0; i<P-1; i++){
@@ -104,6 +115,9 @@ public class SistemaCNE {
 
         // luego, transformo ese array en un heap y "piso" el heap anterior : O(P)
         this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistritoSinBlanco);
+
+        // actualizo el umbral
+        
 
     }
 
@@ -141,14 +155,25 @@ public class SistemaCNE {
     public int[] resultadosDiputados(int idDistrito){
         // hay que arreglar esto
         // el problema es que res parece cambiar a medida que se ejecuta el for más de una vez
-        int[] res = new int[this.P]; // O(P)????
+        // inicializo en p-1 porque no quiero contar los votos en blanco
+        int[] res = new int[this.P-1]; // O(P)????
         int bancasDisputa = diputadosEnDisputa(idDistrito); // O(1)
 
-        for (int i=0; i<bancasDisputa; i++){ // O(bancasDisputa)
-            int idPartido = resultadosPorDistritos[idDistrito].Dividir(); // O(log(P))
-            res[idPartido] += 1;
+        // chequeo si ya calcule los escaños para este distrito
+        if (fueCalculado[idDistrito]){
+            return escañosAsignados[idDistrito];
         }
-        return res;
+        else{
+            for (int i=0; i<bancasDisputa; i++){ // O(bancasDisputa)
+                int idPartido = resultadosPorDistritos[idDistrito].Dividir(); // O(log(P))
+                res[idPartido] += 1;
+            }
+            // actualizo los escaños asignados
+            this.fueCalculado[idDistrito] = true;
+            this.escañosAsignados[idDistrito] = res; // se pasa por referencia? toma O(P)?
+            return res;
+        }
+
     }
 
     public boolean hayBallotage(){
