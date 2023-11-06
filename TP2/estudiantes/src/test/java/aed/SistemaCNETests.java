@@ -287,6 +287,8 @@ class SistemaCNETests {
         assertEquals(0, sistema.resultadosDiputados(3)[4]);
     }
 
+
+    // este no pasa
     @Test
     void obtenerResultadosDiputadosVariosDistritos(){
         int[][] votosMesaCordoba = {{1577, 1577}, {2457, 2457}, {3417, 3417}, {947, 947}, {553, 553}, {114, 114}};
@@ -325,6 +327,7 @@ class SistemaCNETests {
         assertEquals(1, sistema.resultadosDiputados(5)[4]);
     }
 
+    // este no pasa
     @Test
     void unoSuperaElUmbral(){
         int[][] votosMesa1 = {{84, 84}, {13, 13}, {15, 15}, {14, 14}, {0, 0}, {1510, 1510}};
@@ -430,6 +433,8 @@ class SistemaCNETests {
         }
     }
 
+
+    // este no pasa
     @Test
     @Timeout(4)
     void complejidadRegistrarMesa() {
@@ -448,6 +453,7 @@ class SistemaCNETests {
         }
     }
 
+    // este no pasa
     @Test
     @Timeout(3)
     void complejidadResultadosDiputados() {

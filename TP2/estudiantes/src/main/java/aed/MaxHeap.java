@@ -17,22 +17,26 @@ public class MaxHeap{
     public MaxHeap(int[] s){
         // Array2Heap
         // the array must be of length P
-        this.elementos = new NodoDHont[s.length];
-        this.P = 0;
         this.posProximo = 0;
         this.votosTotalesDelDistrito = 0;
 
-        // busco los votos totales
-        for (int i=0; i<P; i++){
+        // Busco los votos totales
+        for (int i=0; i<s.length; i++)
             this.votosTotalesDelDistrito += s[i];
+
+        int cantElementosValidos = 0;
+        for (int i=0; i<s.length; i++){
+            if (s[i] > this.votosTotalesDelDistrito*0.03)
+                cantElementosValidos++;
         }
+        this.P = cantElementosValidos;
+        this.elementos = new NodoDHont[cantElementosValidos];
 
         // Copy the elements into the heap ==> O(P)
-        for (int i = 0; i < P; i++) {
-            if (pasaElUmbral(s[i], this.votosTotalesDelDistrito)){
-                this.elementos[i] = new NodoDHont(i, s[i]);
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] > this.votosTotalesDelDistrito*0.03) {
+                this.elementos[this.posProximo] = new NodoDHont(i, s[i]);
                 this.posProximo++;
-                this.P++;
             }
         }
 
@@ -126,7 +130,7 @@ public class MaxHeap{
         int posHijoIzq = 2*pos+1;
         int posHijoDer = 2*pos+2;
 
-        while (!esHoja(pos) && tieneUnHijoMayor(pos)){
+        while (pos < P && !esHoja(pos) && tieneUnHijoMayor(pos)){
             // Hacemos un swap con el hijo que tenga mayor prioridad
             if(this.elementos[posHijoIzq].cocientes > this.elementos[posHijoDer].cocientes){
                 // Swap con el hijo izquierdo
