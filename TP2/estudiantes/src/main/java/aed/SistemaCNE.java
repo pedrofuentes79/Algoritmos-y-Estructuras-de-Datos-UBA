@@ -26,8 +26,8 @@ public class SistemaCNE {
         this.diputadosEnDisputa = diputadosPorDistrito;
         this.P = nombresPartidos.length;
         this.D = nombresDistritos.length;
-        this.votosDiputados = new int[P][D];
-        this.votosPresidenciales = new int[P];
+        this.votosDiputados = new int[D][P+1];
+        this.votosPresidenciales = new int[P+1];
         // que pasa cuando hay 0 votos para cada partido?
         this.hayBallotage = false;
 
@@ -55,6 +55,7 @@ public class SistemaCNE {
     }
 
     public int idDistritoMesa(int idMesa){
+        // busqueda binaria en mesasPorDistritos, que ya esta ordenada
         // requiere que el idMesa sea menor a la ultima mesa del ultimo distrito
             
         int low = 0;
@@ -80,27 +81,24 @@ public class SistemaCNE {
     // O(3P + log(D))
 
 
-    // actamesa = [(0,0), (100,100), (50,30)]
-    // votosPres = [1000, 200+100, 100+50]
-
-
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
+        // busco el distrito de la mesa con la busqueda binaria  : O(log(D))
+        int idDistrito = idDistritoMesa(idMesa);
+        int[] votosDistrito = this.votosDiputados[idDistrito].clone();
+
         // sumo los votos presidenciales : O(P)
         for (int i=0; i<P; i++){
             this.votosPresidenciales[i] += actaMesa[i].votosPresidente();
+            this.votosDiputados[idDistrito][i] += actaMesa[i].votosDiputados();
+            System.out.println(this.votosDiputados[idDistrito]);
+            votosDistrito[i] += actaMesa[i].votosDiputados();
         }
         // chequeo si hay ballotage : O(P)
         this.hayBallotage = auxBallotage(this.votosPresidenciales);
 
-        // busco el distrito de la mesa con la busqueda binaria  : O(log(D))
-        int idDistrito = idDistritoMesa(idMesa);
-
-        // Agarro el array correspondiente a mi distrito, le hago una copia y le sumo los votos correspondientes : O(P)
-        // clone()??? (seguro que es O(P))
-        int[] votosDistrito = this.votosDiputados[idDistrito].clone();
-
         // luego, transformo ese array en un heap y "piso" el heap anterior : O(P)
         this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistrito);
+
     }
 
     private boolean auxBallotage(int[] votosPresidenciales) {
@@ -131,7 +129,7 @@ public class SistemaCNE {
     }
 
     public int votosDiputados(int idPartido, int idDistrito) {
-        return votosDiputados[idPartido][idDistrito];
+        return votosDiputados[idDistrito][idPartido];
     }
 
     public int[] resultadosDiputados(int idDistrito){

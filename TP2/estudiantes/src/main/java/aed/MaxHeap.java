@@ -1,11 +1,14 @@
 package aed;
 import aed.NodoDHont;
 
+// pasa el umbral si supera el 3% de los votos
+
 public class MaxHeap{
 
     private NodoDHont[] elementos;
     private int posProximo; 
     private int P;
+    private int votosTotalesDelDistrito;
 
     // armar un constructor que devuelva un heap con todos 0
     // armar un constructor que devuelva un heap con los elementos de un array
@@ -14,20 +17,33 @@ public class MaxHeap{
     public MaxHeap(int[] s){
         // Array2Heap
         // the array must be of length P
-        this.elementos = (NodoDHont[]) new Object[s.length];
-        this.P = s.length;
+        this.elementos = new NodoDHont[s.length];
+        this.P = 0;
         this.posProximo = 0;
+        this.votosTotalesDelDistrito = 0;
+
+        // busco los votos totales
+        for (int i=0; i<P; i++){
+            this.votosTotalesDelDistrito += s[i];
+        }
 
         // Copy the elements into the heap ==> O(P)
         for (int i = 0; i < P; i++) {
-            this.elementos[i] = new NodoDHont(i, s[i]);
-            this.posProximo++;
+            if (pasaElUmbral(s[i], this.votosTotalesDelDistrito)){
+                this.elementos[i] = new NodoDHont(i, s[i]);
+                this.posProximo++;
+                this.P++;
+            }
         }
 
         // Algoritmo de Floyd ==> O(P)
         for (int i = (posProximo / 2) - 1; i >= 0; i--) {
             siftDown(i); 
         }
+    }
+
+    public boolean pasaElUmbral(int votos, int votosTotales){
+        return votos > votosTotales*0.03;
     }
 
     public void siftDown(int i) {
@@ -79,7 +95,7 @@ public class MaxHeap{
         // Obtengo el idPartido de la raiz
         int res = this.elementos[0].idPartido;
         // Divido la raiz
-        this.elementos[0].cocientes = this.elementos[0].cocientes * this.elementos[0].vecesDividido/ this.elementos[0].vecesDividido+1;
+        this.elementos[0].cocientes = (this.elementos[0].cocientes * this.elementos[0].vecesDividido)/ (this.elementos[0].vecesDividido +1);
         this.elementos[0].vecesDividido++;
 
         // Reordenamos el heap (si es necesario)
@@ -110,8 +126,7 @@ public class MaxHeap{
         int posHijoIzq = 2*pos+1;
         int posHijoDer = 2*pos+2;
 
-        while (!esHoja(pos) && tieneMenorPrioridad(pos))
-        {
+        while (!esHoja(pos) && tieneUnHijoMayor(pos)){
             // Hacemos un swap con el hijo que tenga mayor prioridad
             if(this.elementos[posHijoIzq].cocientes > this.elementos[posHijoDer].cocientes){
                 // Swap con el hijo izquierdo
@@ -136,16 +151,20 @@ public class MaxHeap{
     }
 
     private boolean esHoja(int pos){
-        return this.elementos[2*pos+1] != null;
+        return 2*pos+1 > P-1;
     }
 
-    private boolean tieneMenorPrioridad(int pos){
+    private boolean tieneUnHijoMayor(int pos){
         // Alguno de sus hijos tiene mas prioridad
-        // Obs: Esto no se va a indeterminar (se va de rango) porque esHoja() chequea que el hijo izquierdo exista
-        int posHijoIzq = 2*pos+1;
         int posHijoDer = 2*pos+2;
-        return this.elementos[pos].cocientes < this.elementos[posHijoIzq].cocientes || 
-               this.elementos[pos].cocientes < this.elementos[posHijoDer].cocientes;
+        int posHijoIzq = 2*pos+1;
+
+        if (posHijoDer < P){
+            return this.elementos[pos].cocientes < this.elementos[posHijoIzq].cocientes || 
+                   this.elementos[pos].cocientes < this.elementos[posHijoDer].cocientes;
+        }
+        else{
+            return this.elementos[pos].cocientes < this.elementos[posHijoIzq].cocientes;
+        }
     }
 }
-
