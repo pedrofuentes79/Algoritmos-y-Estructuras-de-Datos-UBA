@@ -90,7 +90,6 @@ public class SistemaCNE {
         for (int i=0; i<P; i++){
             this.votosPresidenciales[i] += actaMesa[i].votosPresidente();
             this.votosDiputados[idDistrito][i] += actaMesa[i].votosDiputados();
-            System.out.println(this.votosDiputados[idDistrito]);
             votosDistrito[i] += actaMesa[i].votosDiputados();
         }
         // chequeo si hay ballotage : O(P)
@@ -134,8 +133,9 @@ public class SistemaCNE {
 
     public int[] resultadosDiputados(int idDistrito){
         // 
-        int[] res = new int[this.P];
+        int[] res = new int[this.P]; // O(P)????
         int bancasDisputa = diputadosEnDisputa(idDistrito); // O(1)
+
         for (int i=0; i<bancasDisputa; i++){ // O(bancasDisputa)
             int idPartido = resultadosPorDistritos[idDistrito].Dividir(); // O(log(P))
             res[idPartido] += 1;

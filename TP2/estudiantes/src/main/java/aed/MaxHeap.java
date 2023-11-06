@@ -24,6 +24,7 @@ public class MaxHeap{
         for (int i=0; i<s.length; i++)
             this.votosTotalesDelDistrito += s[i];
 
+        // Busco la cantidad de elementos validos (que pasan el umbral)
         int cantElementosValidos = 0;
         for (int i=0; i<s.length; i++){
             if (s[i] > this.votosTotalesDelDistrito*0.03)
@@ -32,7 +33,7 @@ public class MaxHeap{
         this.P = cantElementosValidos;
         this.elementos = new NodoDHont[cantElementosValidos];
 
-        // Copy the elements into the heap ==> O(P)
+        // Meto los que pasan el umbral en el array ==> O(P)
         for (int i = 0; i < s.length; i++) {
             if (s[i] > this.votosTotalesDelDistrito*0.03) {
                 this.elementos[this.posProximo] = new NodoDHont(i, s[i]);
@@ -40,7 +41,7 @@ public class MaxHeap{
             }
         }
 
-        // Algoritmo de Floyd ==> O(P)
+        // Algoritmo de Floyd con el array elementos ==> O(P)
         for (int i = (posProximo / 2) - 1; i >= 0; i--) {
             siftDown(i); 
         }
@@ -102,7 +103,7 @@ public class MaxHeap{
         this.elementos[0].cocientes = (this.elementos[0].cocientes * this.elementos[0].vecesDividido)/ (this.elementos[0].vecesDividido +1);
         this.elementos[0].vecesDividido++;
 
-        // Reordenamos el heap (si es necesario)
+        // Reordenamos el heap (si es necesario) ==> O(log(P))
         Bajar();
 
         return res;        
@@ -132,7 +133,9 @@ public class MaxHeap{
 
         while (pos < P && !esHoja(pos) && tieneUnHijoMayor(pos)){
             // Hacemos un swap con el hijo que tenga mayor prioridad
-            if(this.elementos[posHijoIzq].cocientes > this.elementos[posHijoDer].cocientes){
+            System.out.println(pos);
+            if(this.elementos[posHijoIzq].cocientes 
+            > this.elementos[posHijoDer].cocientes){
                 // Swap con el hijo izquierdo
                 NodoDHont aux = this.elementos[posHijoIzq];
                 this.elementos[posHijoIzq] = this.elementos[pos];
@@ -155,7 +158,8 @@ public class MaxHeap{
     }
 
     private boolean esHoja(int pos){
-        return 2*pos+1 > P-1;
+        // Es hoja si no tiene hijo izquierdo
+        return 2*pos+1 >= P;
     }
 
     private boolean tieneUnHijoMayor(int pos){
