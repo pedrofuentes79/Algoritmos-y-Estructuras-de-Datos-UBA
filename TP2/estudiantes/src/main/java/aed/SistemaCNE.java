@@ -1,19 +1,18 @@
 package aed;
 public class SistemaCNE {
-    private int P;
-    private int D;
-    private String[] nombrePartido;
-    private String[] nombreDistrito;
-    private int[] diputadosEnDisputa;
-    private int[][] votosDiputados;
-    private int[] votosPresidenciales;
-    private boolean hayBallotage;
-    private int[] mesasPorDistritos;
-    private MaxHeap[] resultadosPorDistritos;
-
-    // variables de escaños asignados
-    private boolean[] fueCalculado;
-    private int[][] escañosAsignados;
+ 
+    private int P; // cantidad de partidos + 1 (incluye voto en blanco)
+    private int D; // cantidad de distritos
+    private String[] nombrePartido; // array de nombres de partidos (indice como id)
+    private String[] nombreDistrito; // array de nombres de distritos (indice como id)
+    private int[] diputadosEnDisputa; // cantidad de bancas a repartir por distrito
+    private int[][] votosDiputados; // matriz de votos de diputados P x D
+    private int[] votosPresidenciales; // array de votos presidenciales por partido
+    private boolean hayBallotage; // variable de control para el ballotage
+    private int[] mesasPorDistritos; // ultima mesa de cada distrito (array ordenado)
+    private MaxHeap[] resultadosPorDistritos; // array de Heaps con los resultados de diputados por distrito
+    private boolean[] fueCalculado; // array de D booleanos que indica si ya tenemos calculadas las bancas para el distrito 
+    private int[][] escañosAsignados; // array de D x P con las bancas asignadas por partido en los distritos ya calculados
 
     public class VotosPartido{
         // ambos >= 0
@@ -24,152 +23,170 @@ public class SistemaCNE {
         public int votosDiputados(){return diputados;}
     }
 
-    public SistemaCNE(String[] nombresDistritos, int[] diputadosPorDistrito, String[] nombresPartidos, int[] ultimasMesasDistritos) {
+    public SistemaCNE(String[] nombresDistritos,
+                      int[] diputadosPorDistrito,
+                      String[] nombresPartidos,
+                      int[] ultimasMesasDistritos) {
+
+        // Método constructor de la clase SistemaCNE.
+        // Complejidad: O(D)
+
+        // Inicializamos variables privadas
         this.nombrePartido = nombresPartidos;
         this.nombreDistrito = nombresDistritos;
         this.diputadosEnDisputa = diputadosPorDistrito;
-        this.P = nombresPartidos.length; // P incluye los votos en blanco
+        this.P = nombresPartidos.length; 
         this.D = nombresDistritos.length;
         this.votosDiputados = new int[D][P];
         this.votosPresidenciales = new int[P];
-        // que pasa cuando hay 0 votos para cada partido?
         this.hayBallotage = false;
-
         this.mesasPorDistritos = ultimasMesasDistritos;
         
-        // construir la matriz de MaxHeaps (de long P) inicializada en 0
+        // Construimos un array de MaxHeaps (de long P) inicializados vacíos
         this.resultadosPorDistritos = new MaxHeap[D];
 
-        // construir el array de fueCalculado (todos en false) y el array de escañosAsignados (todos en 0)
+        // Construimos el array de fueCalculado (todos en false) y el array de escañosAsignados (todos en 0)
         this.fueCalculado = new boolean[D];
         this.escañosAsignados = new int[D][P-1];
 
-
-        // inicializar los MaxHeaps en 0, con longitud P-1 así saco los votos en blanco
-        for (int i=0; i<D; i++){
+        // Inicializamos los MaxHeaps en 0, con longitud P-1 así sacamos los votos en blanco
+        for (int i=0; i<this.D; i++)
             this.resultadosPorDistritos[i] = new MaxHeap(P-1);
-        }
     }
 
     public String nombrePartido(int idPartido) {
-        return nombrePartido[idPartido];
+        // Complejidad: O(1)
+        return this.nombrePartido[idPartido];
     }
 
     public String nombreDistrito(int idDistrito) {
-        return nombreDistrito[idDistrito];
+        // Complejidad: O(1)
+        return this.nombreDistrito[idDistrito];
     }
 
     public int diputadosEnDisputa(int idDistrito) {
-        return diputadosEnDisputa[idDistrito];
+        // Complejidad: O(1)
+        return this.diputadosEnDisputa[idDistrito];
     }
 
-    public int idDistritoMesa(int idMesa){
-        // busqueda binaria en mesasPorDistritos, que ya esta ordenada
-        // requiere que el idMesa sea menor a la ultima mesa del ultimo distrito
-            
+    public int idDistritoMesa(int idMesa){        
+        // Recibe un idMesa y devuelve el idDistrito al que pertenece,
+        // Como la lista de mesasPorDistrito está ordenada, realizamos una búsqueda binaria, 
+        // Complejidad: O(log D)
+
         int low = 0;
-        int high = mesasPorDistritos.length - 1;
-        
-        // small check so that the list isn't out of range at the end
-        if (idMesa >= mesasPorDistritos[high]) return high;
+        int high = this.mesasPorDistritos.length - 1;      
+
+        // Requiere que el idMesa sea válido (idMesa < mesasPorDistritos[mesasPorDistritos.length - 1])
+        // CREO QUE ESTA LINEA PODRIAMOS COMENTARLA
+        if (idMesa >= this.mesasPorDistritos[high]) return high;        
         
         while (low <= high){
             int mid = (low + high) / 2;
-    
-            if (idMesa < mesasPorDistritos[mid]){
+            if (idMesa < this.mesasPorDistritos[mid])
                 high = mid - 1;
-            } else {
+            else 
                 low = mid + 1;
-            }
         }
+ 
         return high+1;
     }
+
     public String distritoDeMesa(int idMesa) {
-        return nombreDistrito[idDistritoMesa(idMesa)];
+        // Complejidad: O(1)
+        return this.nombreDistrito[idDistritoMesa(idMesa)];
     }
 
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
-        // se pide O(P + log(D))
-        // si se pide registrar una mesa después de haber calculado los escaños, esa distribucion de escaños puede estar mal
-            // a menos que pueda calcular de vuelta los escaños en la complejidad pedida
+        // Registra los votos presidenciales y de diputados dada una mesa.
+        // Complejidad: O(P + log D)
 
-        // busco el distrito de la mesa con la busqueda binaria  : O(log(D))
+        // 1. Buscamos el distrito de la mesa con la busqueda binaria: O(log D)
         int idDistrito = idDistritoMesa(idMesa);
 
-        // sumo los votos presidenciales : O(P)
-        for (int i=0; i<P; i++){
+        // 2. Sumamos los votos presidenciales y de diputados: O(P)
+        for (int i=0; i<this.P; i++){
             this.votosPresidenciales[i] += actaMesa[i].votosPresidente();
             this.votosDiputados[idDistrito][i] += actaMesa[i].votosDiputados();
         }
-        // chequeo si hay ballotage : O(P)
-        this.hayBallotage = auxBallotage(this.votosPresidenciales);
 
-        // Hago la copia con los votos ya sumados
-        int[] votosDistrito = this.votosDiputados[idDistrito].clone(); // O(P)
+        // 3. Actualizamos la variable de control hayBallotage: O(P)
+        this.hayBallotage = auxBallotage();
 
-        // luego, transformo ese array en un heap y "piso" el heap anterior : O(P)
-        this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistrito);        
-
+        // 4. Actualizamos el heap con los votos de diputado asociado al distrito (se crea uno nuevo).
+        int[] votosDistrito = this.votosDiputados[idDistrito].clone(); 
+        this.resultadosPorDistritos[idDistrito] = new MaxHeap(votosDistrito); // O(P) ~ Algoritmo de Floyd       
     }
 
-    private boolean auxBallotage(int[] votosPresidenciales) {
-        int max = 0;
-        int max2 = 0;
+    private boolean auxBallotage() {
+        // Valida si "hay ballotage" hasta el momento, es decir, 
+        // si el total de votos fuera Sum(votosPresidenciales).
+        // Complejidad: O(P)
+        
+        int primero = 0;
+        int segundo = 0;
         int totalVotos = 0;
+
         for (int i=0; i<P; i++){
-            if (votosPresidenciales[i] > max){
-                max2 = max;
-                max = votosPresidenciales[i];
-            } else if (votosPresidenciales[i] > max2){
-                max2 = votosPresidenciales[i];
+            if (this.votosPresidenciales[i] > primero){
+                segundo = primero;
+                primero = this.votosPresidenciales[i];
             }
-            totalVotos += votosPresidenciales[i];
+            else if (this.votosPresidenciales[i] > segundo){
+                segundo = this.votosPresidenciales[i];
+            }
+            totalVotos += this.votosPresidenciales[i];
         }
         
-        if (max > totalVotos*0.45){
+        if (primero > totalVotos*0.45 
+            || ((primero - segundo) > 0.1*totalVotos && primero > 0.4*totalVotos))
             return false;
-        } else if ((max - max2) > 0.1*totalVotos && max > 0.4*totalVotos){
-            return false;
-        } else {
-            return true;
-        }
+
+        return true;
     }
 
     public int votosPresidenciales(int idPartido) {
-        return votosPresidenciales[idPartido];
+        // Complejidad: O(1)
+        return this.votosPresidenciales[idPartido];
     }
 
     public int votosDiputados(int idPartido, int idDistrito) {
-        return votosDiputados[idDistrito][idPartido];
+        // Complejidad: O(P)
+        return this.votosDiputados[idDistrito][idPartido];
     }
 
     public int[] resultadosDiputados(int idDistrito){
-        // se pide O(Dd * log(P))
+        // Dado un distrito, pide devolver la cantidad de bancas asignadas por partido
+        // en las elecciones de diputados para ese distrito.
+        // Complejidad: pide O(Dd * log P)
 
-        // hay que arreglar esto
-        // el problema es que res parece cambiar a medida que se ejecuta el for más de una vez
-        // inicializo en p-1 porque no quiero contar los votos en blanco
-        int[] res = new int[this.P-1]; // O(P)????
-        int bancasDisputa = diputadosEnDisputa(idDistrito); // O(1)
+        // Inicializamos un array de P-1 porque el voto en blanco no puede tener bancas
+        int[] res = new int[this.P-1]; 
+        int Dd = diputadosEnDisputa(idDistrito); // O(1)
 
-        // chequeo si ya calcule los escaños para este distrito
-        if (fueCalculado[idDistrito]){
-            return escañosAsignados[idDistrito];
+        // Validamos si ya sabemos las bancas de este distrito,
+        // esto es para evitar que se vuelvan a realizar las asignaciones
+        // con los cocientes DHont ya modificados
+        if (this.fueCalculado[idDistrito]){
+            return this.escañosAsignados[idDistrito];
         }
         else{
-            for (int i=0; i<bancasDisputa; i++){ // O(bancasDisputa)
-                int idPartido = resultadosPorDistritos[idDistrito].Dividir(); // O(log(P))
+            // Por cada banca a asignar le asignamos un partido a través de la raíz del heap
+            // del distrito
+            for (int i=0; i<Dd; i++){ // O(Dd)
+                int idPartido = this.resultadosPorDistritos[idDistrito].proximaBanca(); // O(log P)
                 res[idPartido] += 1;
             }
-            // actualizo los escaños asignados
+
+            // Actualizamos los escaños asignados
             this.fueCalculado[idDistrito] = true;
-            this.escañosAsignados[idDistrito] = res; // se pasa por referencia? toma O(P)?
+            this.escañosAsignados[idDistrito] = res; 
             return res;
         }
-
     }
 
     public boolean hayBallotage(){
+        // Complejidad: O(1)
         return this.hayBallotage;
     }
 }
