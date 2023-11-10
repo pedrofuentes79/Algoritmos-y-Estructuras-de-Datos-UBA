@@ -16,8 +16,6 @@
 
 package aed;
 
-import aed.NodoDHont;
-
 public class MaxHeap {
 
     // Atributos privados del Heap
@@ -27,7 +25,7 @@ public class MaxHeap {
 
     public MaxHeap(int P) {
         // Constructor [1] del MaxHeap: Inicializa un heap vacío
-        // Complejidad: O(1)
+        // Complejidad: O(P)
         this.elementos = new NodoDHont[P];
         this.len = P;
         this.posProximo = 0;
@@ -46,8 +44,7 @@ public class MaxHeap {
         for (int i = 0; i < s.length; i++)
             votosTotalesDelDistrito += s[i];
 
-        // Busco la cantidad de elementos que pasan el umbral (excluyo votos en blanco):
-        // O(P)
+        // Busco la cantidad de elementos que pasan el umbral (excluyo votos en blanco): O(P)
         int cantElementosValidos = 0;
         for (int i = 0; i < s.length - 1; i++) {
             if (s[i] > votosTotalesDelDistrito * 0.03)
@@ -55,7 +52,7 @@ public class MaxHeap {
         }
         this.len = cantElementosValidos;
 
-        // Inicializamos los elementos del heap como un array de $len nodos
+        // Inicializamos los elementos del heap como un array de $len nodos: O(P), pues len<=P
         this.elementos = new NodoDHont[cantElementosValidos];
 
         // Agregamos como nodo a todos los partidos que pasan el umbral: O(P)
@@ -82,8 +79,7 @@ public class MaxHeap {
     }
 
     public void floydRecursivo(int i) {
-        // QUE HACE ACA NO TENGO IDEA JAJA SALU2
-        // DESPUEs EN LLAMADA LO VEMOS
+        // Swapea el nodo i con su hijo de mayor prioridad
 
         int largest = i;
         int left = 2 * i + 1;

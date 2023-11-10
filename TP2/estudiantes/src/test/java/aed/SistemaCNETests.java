@@ -452,7 +452,6 @@ class SistemaCNETests {
         }
     }
 
-    // este no pasa
     @Test
     @Timeout(3)
     void complejidadResultadosDiputados() {
