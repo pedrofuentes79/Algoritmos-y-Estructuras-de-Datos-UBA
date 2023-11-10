@@ -1,3 +1,19 @@
+/* 
+    INVREP MaxHeap:
+    * Árbol Binario perfectamente balanceado.
+    * El valor de cada nodo es mayor o igual que el de sus hijos, si los tiene.
+    * Todo subárbol es un heap.
+    * Se completa cada nivel de izquierda a derecha (izquierdista)
+
+    Nuestros observadores.
+    * this->elementos tiene cada nodo del heap. La estructura del heap es de este modo. Si p es el nodo actual 
+    y u es su posición, el hijo izquierdo de p estará en la posición 2*u+1 y el hijo derecho de p estará en la posición 2*u+2.    
+    * this->len es la longitud del array, en nuestro caso no cambia nunca pues se inicializa con un tamaño y este no cambia. 
+      Como estamos implementando partidos, len sería la cantidad de partidos válidos.    
+    * this->posProximo es un entero que apunta a la próxima posición a ingresar a un elemento nuevo.
+     
+*/
+
 package aed;
 
 import aed.NodoDHont;

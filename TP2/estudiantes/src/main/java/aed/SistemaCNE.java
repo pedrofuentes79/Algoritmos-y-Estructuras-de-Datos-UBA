@@ -1,36 +1,29 @@
 package aed;
 public class SistemaCNE {
     /*
-    INVREP
 
-    La longitud de nombrePartido, votosPresidenciales, es P
-    La longitud de nombreDistrito, diputadosEnDisputa es D. 
-    nombrePartido tiene en cada índice el nombre de su partido correspondiente
-    nombreDistrito tiene en cada índice el nombre de su distrito correspondiente.
-    diputadosEnDisputa tiene en cada índice (correspondiente al índice del distrito) cuántos diputados le corresponden a ese distrito, un número > 0.
-    votosDiputados es una matriz de D x P. En cada fila hay un array de longitud P que tiene los votos de cada partido en cada indice. Cada array es un distrito.
-    escañosAsignados es una matriz de D x P-1, porque no incluyo los votos en blanco para asignar escaño. En cada fila hay un array de longitud P-1 que tiene los escaños asignados previamente de cada partido. Cada array le corresponde a un distrito.
-    fueCalculado es un array de booleanos de longitud D, que indica si a cada distrito se le calcularon ya sus escaños.
-    hayBallotage indica el estado actual del array de votosPresidenciales. Es calculado cada vez que se registra una nueva mesa.
-    mesasPorDistritos tiene, en cada índice correspondiente a cada distrito, el último número de mesa de ese distrito.
-    resultadosPorDistrito es un array de Heaps, que tiene en cada indice un distrito. Es decir que a cada distrito le corresponde un Heap.
+    INVREP SISTEMA_CNE:
+    * La longitud de nombrePartido, votosPresidenciales, es P.    
+    * La longitud de nombreDistrito, diputadosEnDisputa es D. 
+    * nombrePartido tiene en cada índice el nombre de su partido correspondiente.    
+    * nombreDistrito tiene en cada índice el nombre de su distrito correspondiente.
+    * diputadosEnDisputa tiene en cada índice (correspondiente al índice del distrito) 
+      cuántos diputados le corresponden a ese distrito, un número >= 0.
+    * votosDiputados es una matriz de D x P. En cada fila hay un array de longitud P que tiene los votos de cada partido en cada indice. 
+      Cada array es un distrito. Para cualquier d y p valido se cumple votosDiputatos[d][p] >= 0.
+    * escañosAsignados es una matriz de D x P-1, porque no incluyo los votos en blanco para asignar escaño.
+      En cada fila d hay un array (correspondiente al distrito d) de longitud P-1 que tiene los escaños asignados previamente de cada partido.
+    * fueCalculado es un array de booleanos de longitud D, que indica si a cada distrito se le calcularon ya sus escaños,
+      es decir si en todos los nodos del heap correspondiente a ese distrito el valorOriginal es igual al cociente.    
+    * hayBallotage indica el estado actual del array de votosPresidenciales. Es calculado cada vez que se registra una nueva mesa.
+      Este atributo es True <=> para los votos presidenciales registrados hasta el momento hay ballotage.
+    * mesasPorDistritos tiene, en cada índice correspondiente a cada distrito, el último número de mesa de ese distrito.
+      Cumple que es una lista ordenada.    
+    * resultadosPorDistrito es un array que tiene en cada indice D un heap asociado a los votos de diputados del distrito D.
+      Es decir que a cada distrito le corresponde un Heap.
+    * escañosAsignados es una matriz de enteros D x P-1 que indica la cantidad de escaños que le fueron asignados a un partido P en el distrito D.
 
-    MaxHeap
-    Un heap sigue el siguiente invariante:
-    ABB perfectamente balanceado
-    El valor de cada nodo es mayor o igual que el de sus hijos, si los tiene
-    Todo subárbol es un heap
-    Se completa cada nivel de izquierda a derecha.
-
-    Nuestros observadores.
-    En el array elementos está cada nodo del heap. La estructura del heap es de este modo. Si p es el nodo actual y u es su posición, el hijo izquierdo de p estará en la posición 2*u+1 y el hijo derecho de p estará en la posición 2*u+2.
-    len es la longitud del array, en nuestro caso no cambia nunca pues se inicializa con un tamaño y este no cambia. Como estamos implementando partidos, len sería la cantidad de partidos válidos.
-    posProximo es un entero que apunta a la próxima posición a ingresar a un elemento nuevo.
-
-    En cada nodo del heap, utilizamos una estructura aparte que se llama NodoDHont. 
-    Esta estructura tiene como variables el idPartido, votosOriginales (los votos de este partido obtenidos en diputados), el cociente actual, que depende de la cantidad de veces que fue dividido para obtener los escaños. Este valor es el que utilizamos para determinar si un nodo es mayor que otro. 
-    De este modo, podemos obtener el valor máximo del heap en O(1), ya que siempre estará en la raíz. 
-    Por último, escañosAsignados es la cantidad de escaños que le fueron asignados a ese partido. 
+    Observacion: El invariante de representacion del Heap se encuentra en el archivo MaxHeap.java
     */
 
  
