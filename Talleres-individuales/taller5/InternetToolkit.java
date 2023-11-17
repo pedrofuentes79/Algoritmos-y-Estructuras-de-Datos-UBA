@@ -47,8 +47,40 @@ public class InternetToolkit {
     }
 
     public IPv4Address[] sortIPv4(String[] ipv4) {
-        // IMPLEMENTAR
-        return null;
+        IPv4Address[] res = new IPv4Address[ipv4.length];
+
+        int i = 0;
+        for (String strval : ipv4){
+            IPv4Address t = new IPv4Address(strval);
+            res[i] = t;
+            i++;
+        }
+
+        // ordeno 4 veces, una para cada digito
+        for(int j=0; j<4; j++){ 
+            // usar insertion sort con [octeto]
+            insertionSort(res, j);
+        }
+
+        return res;
+
     }
 
+    private IPv4Address[] insertionSort(IPv4Address[] arr, int digito){
+        int n = arr.length;
+        for (int i=1; i<n;i++){
+            // chequeo que el elem actual sea mayor al previo
+            int j = i-1;
+
+            // mientras sea menor al ultimo visto
+            while(j>=0 && arr[j].getOctet(digito) > arr[j+1].getOctet(digito)){
+                IPv4Address aux = new IPv4Address(arr[j+1].toString());
+                arr[j+1] = arr[j];
+                arr[j] = aux;
+                j--;
+            }
+        }
+
+        return arr;
+    }
 }
