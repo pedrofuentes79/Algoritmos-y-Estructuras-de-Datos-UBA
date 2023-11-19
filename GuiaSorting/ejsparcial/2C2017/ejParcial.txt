@@ -1,0 +1,64 @@
+// Se tiene en cuenta que A es un array de tuplas de enteros, de longitud n
+
+buckets = Array(ListaEnlazada(int))[365];
+
+for (int i=0; i<n; i++){             // O(n)
+    inicio = A[i][0];
+    fin = A[i][1];
+    buckets[inicio].agregarAtras(i); // O(1)
+    buckets[fin].agregarAtras(i)     // O(1)
+}
+
+interrupciones = DiccTrie(<Interrupciones, Indice>);
+yaConteLasInterrupciones = Array(bool)[n] // O(n)
+// nota, podría haber usado un array en vez de DiccTrie, con solo #interrupciones x indice
+// tendría que haberlo inicializado con algún placeholder != 0. Hubiese tomado más tiempo creo?
+// no sé. Uso el DiccTrie porque me cuesta todo O(1) porque están acotados los índices.
+
+
+// No estoy seguro de cómo justificar que esto es O(n)
+for (int i=0; i<365; i++){
+    // Itero sobre los intervalos que comienzan por i
+    // Uso el iterador para la lista enlazada
+    it = CrearIterador(buckets[i]);
+    while (it.haySiguiente()){
+        indiceActual = it.siguiente();
+        // Caso en el que actual es el inicio del intervalo (a,b) y no le calculé aún sus interrupciones
+        if (!yaConteLasInterrupciones[indiceActual]){
+            // Dado el intervalo actual, calculo sus interrupciones y las guardo en el dict
+            inicio = A[i][0];
+            fin = A[i][1];
+            contadorInterrupciones = 0;
+            for (int k=inicio+1; k<fin;k++){ // O(fin-inicio)
+                contadorInterrupciones += buckets[k].length; // O(1)
+            }
+            interrupciones.definir(contadorInterrupciones, indiceActual)
+            yaConteLasInterrupciones[indiceActual] = true;
+        }
+        else{
+            // Si ya está definido, significa que estoy parado en el fin de mi intervalo => ya lo definí.
+            skip();
+        }
+
+    }
+}
+
+// Ahora, resta hacer un forloop de cantidad de interrupciones, de menor a mayor. (0...n).
+// Y agregar los indices correspondientes
+
+res = Array(<int,int>)[n]   // O(n)
+elemsAgregados = 0;
+
+for (int i=0; i<n;i++){ // O(n), pues se agregarán n elementos al array y se iterará sobre n elementos en total.
+    // Si hay intervalos que tengan i interrupciones
+    if(interrupciones.estaDefinido?(i)){ // O(1)
+        // Obtengo los indices de los intervalos que tienen i interrupciones
+        indices = interrupciones.obtener(i); // O(1)
+        for each k in indices{
+            // no importa el orden en el que los agrego, no me piden estabilidad, por eso el for each
+            // agrego A[k], k siendo el indice del intervalo con i interrupciones.
+            res[elemsAgregados] = A[k];
+            elemsAgregados++;
+        }
+    }
+}
