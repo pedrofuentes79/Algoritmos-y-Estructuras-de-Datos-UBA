@@ -37,7 +37,7 @@ for (int i=0; i<365; i++){
         }
         else{
             // Si ya está definido, significa que estoy parado en el fin de mi intervalo => ya lo definí.
-            skip();
+            continue;
         }
 
     }

@@ -1,0 +1,44 @@
+// La consigna se puede ver en el pdf
+// En resumen, es ordenar los elementos de A según aparecen en R. Todos los elementos de A están en R.
+
+/* 
+m = A.length;
+n = R.length;
+
+Explicación:
+    - Dado que los elementos de R y A son Strings (o quizás podrían no serlo), están acotados por una 
+    constante. Esto me permite usar un diccionario implementado con Tries para contar sus apariciones, 
+    haciendo que las operaciones de definir y obtener me cuesten O(1)
+    - Luego, itero sobre R. Para cada elemento de R, voy a sobreescribir los elementos de A. Para cada 
+    elemento de R lo voy a hacer las veces que haya aparecido en A. Los elementos del array resultante
+    de este ciclo estarán en el mismo orden que aparecen en R. El ciclo tomará O(max(n,m))
+
+
+*/
+
+apariciones = DiccionarioDigital.diccionarioVacio();
+for (int i=0; i<m; i++){
+    if (!apariciones.esta(A[i])){
+        apariciones.definir(A[i],1);
+    } else {
+        apariciones.definir(A[i], apariciones.obtener(A[i]) + 1);
+    }
+}
+
+cantElementosAgregados = 0;
+for (int j=0; j<n; j++){
+    if (apariciones.esta(R[j])){
+        reps = apariciones.obtener(R[j]);
+        for(int k=0; k<reps; k++){
+            A[cantElementosAgregados] = R[j];
+            cantElementosAgregados++;
+        }        
+    }
+    else{
+        // Como este elemento de R no apareció nunca en el array A, no está definido en las apariciones
+        // Por ende, no lo agrego al array A.
+        continue;
+    }
+}
+
+return A;
